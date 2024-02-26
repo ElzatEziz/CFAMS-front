@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-
+import { useUserStore } from '@/stores'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -8,9 +8,13 @@ const router = createRouter({
     {
       path: '/',
       component: () => import('@/views/layout/LayoutPage.vue'),
-      redirect: '/assets/manage',
+      redirect: '/index',
       // 二级路由
       children: [
+        {
+          path: '/index',
+          component: () => import('@/views/index/IndexPage.vue')
+        },
         {
           path: '/assets/manage',
           component: () => import('@/views/assets/AssetsManagePage.vue')
@@ -32,12 +36,28 @@ const router = createRouter({
           component: () => import('@/views/reports/ReportsPage.vue')
         },
         {
-          path: '/users/profile',
-          component: () => import('@/views/users/UsersPage.vue')
+          path: '/users/info',
+          component: () => import('@/views/users/UsersInfoPage.vue')
+        },
+        {
+          path: '/users/repassword',
+          component: () => import('@/views/users/UsersRepasswordPage.vue')
+        },
+        {
+          path: '/users/avatar',
+          component: () => import('@/views/users/UsersAvatarPage.vue')
         }
       ]
     }
   ]
 })
 
+// 登录访问拦截
+router.beforeEach((to) => {
+  const userStore = useUserStore()
+  if (!userStore.token && to.path !== '/login') {
+    return '/login'
+  }
+  return
+})
 export default router

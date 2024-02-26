@@ -1,5 +1,5 @@
 import axios from 'axios'
-
+import { useUserStore } from '@/stores'
 const baseURL = 'http://127.0.0.1:8000/'
 
 const instance = axios.create({
@@ -10,8 +10,13 @@ const instance = axios.create({
 })
 instance.interceptors.request.use(
   function (config) {
-    // 在发送请求之前做些什么
-    // console.log(config)
+    // 获取存储在localStorage或其他地方的Token
+    const userStore = useUserStore()
+    const token = userStore.token
+    if (token) {
+      // 如果Token存在，则在每个请求的头部添加Authorization
+      config.headers['Authorization'] = token
+    }
     return config
   },
   function (error) {

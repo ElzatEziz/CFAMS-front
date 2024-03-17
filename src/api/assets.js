@@ -13,3 +13,7 @@ export const deleteAssetsService = (id) =>
 // 更新资产
 export const updateAssetsService = (id, data) =>
   request.patch(`assets_update/${id}/`, data)
+
+// 筛选资产
+export const filterAssetsService = (data1, data2) =>
+  request.get(`assets_filter/?state=${data1}&&asset_type=${data2}`)

@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { useUserStore } from '@/stores'
+import router from '@/router'
 const baseURL = 'http://127.0.0.1:8000/'
 
 const instance = axios.create({
@@ -31,6 +32,11 @@ instance.interceptors.response.use(
     return response
   },
   function (error) {
+    //TODO5. 处理401错误
+    //错误的特殊情况 =》 401 全县不足 或 token过期 =》 拦截到登陆
+    if (error.response?.status === 401) {
+      router.push('/login')
+    }
     // 超出 2xx 范围的状态码都会触发该函数。
     // 对响应错误做点什么
     console.log(error.response)

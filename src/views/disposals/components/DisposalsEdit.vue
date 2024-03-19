@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { addDisposalsService, updateDisposalsService } from '@/api/disposals'
+import { getAssetsListService } from '@/api/assets'
 const dialogVisible = ref(false)
 const formModel = ref({
   id: '',
@@ -11,6 +12,13 @@ const formModel = ref({
   recipient: '',
   cost_or_revenue: ''
 })
+
+const assetsList = ref([])
+const getAssetsList = async () => {
+  const rest = await getAssetsListService()
+  assetsList.value = rest.data
+}
+getAssetsList()
 
 const convertLabelToValue = (label, options) => {
   const option = options.find((option) => option.label === label)
@@ -86,12 +94,20 @@ defineExpose({
       label-width="100px"
       style="padding-right: 30px"
     >
-      <el-form-item
-        label="资产名称"
-        prop="asset_name"
-        placeholder="请输入资产名称"
-      >
-        <el-input v-model="formModel.asset_name"></el-input>
+      <el-form-item label="资产名称" prop="asset_name" placeholder="请选择资产">
+        <el-select
+          v-model="formModel.asset"
+          class="m-2"
+          placeholder="请选择资产名称"
+          style="width: 240px"
+        >
+          <el-option
+            v-for="item in assetsList"
+            :key="item.name"
+            :label="item.name"
+            :value="item.id"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item
         label="处置日期"
@@ -112,7 +128,7 @@ defineExpose({
         placeholder="请选择处置方式"
       >
         <el-select
-          v-model="formModel.disposal_date"
+          v-model="formModel.disposal_method"
           class="m-2"
           placeholder="请选择处置方式"
           style="width: 240px"

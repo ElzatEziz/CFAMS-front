@@ -1,16 +1,27 @@
 <script setup>
 import { ref } from 'vue'
 import { Edit, Delete } from '@element-plus/icons-vue'
-import { getDisposalsListService } from '@/api/disposals'
+import {
+  deleteDisposalsService,
+  getDisposalsListService
+} from '@/api/disposals'
+
+// eslint-disable-next-line no-unused-vars
 import DisposalsEdit from './components/DisposalsEdit.vue'
+import { ElMessage } from 'element-plus'
+
+// 处置列表
+const disposalsList = ref([])
+
+// 加载状态
 const loading = ref(false)
-const assetsEdit = ref([])
+
+//获取资产列表
 const getDisposalsList = async () => {
   loading.value = true
   try {
     const rest = await getDisposalsListService()
-    disposalsEdit.value = rest.data
-    console.log(rest.data)
+    disposalsList.value = rest.data
   } catch (error) {
     console.error(error)
   } finally {
@@ -19,19 +30,23 @@ const getDisposalsList = async () => {
 }
 getDisposalsList()
 
-const disposalsEdit = ref(null)
+const disposalsEdit = ref()
 
 // 编辑资产
 const onEditAssets = (row) => {
   disposalsEdit.value.open(row)
+  getDisposalsList()
 }
 // 删除资产
-const onDeleteAssets = (row, index) => {
-  console.log(row, index)
+const onDeleteAssets = async (row) => {
+  await deleteDisposalsService(row.id)
+  ElMessage.success('删除成功')
+  getDisposalsList()
 }
 // 新建资产
 const onAddAssets = () => {
-  console.log('新建资产')
+  disposalsEdit.value.open({})
+  getDisposalsList()
 }
 </script>
 <template>
@@ -39,7 +54,7 @@ const onAddAssets = () => {
     <template #extra>
       <el-button type="primary" @click="onAddAssets">新建处置</el-button>
     </template>
-    <el-table v-loading="loading" style="width: 100%" :data="assetsEdit">
+    <el-table v-loading="loading" style="width: 100%" :data="disposalsList">
       <el-table-column type="index" label="序号" width="100"></el-table-column>
       <el-table-column prop="asset_name" label="资产名称"></el-table-column>
       <el-table-column prop="disposal_date" label="处置日期"></el-table-column>

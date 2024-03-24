@@ -23,7 +23,7 @@ const getDisposalsList = async () => {
     const rest = await getDisposalsListService()
     disposalsList.value = rest.data
   } catch (error) {
-    console.error(error)
+    ElMessage.error('获取处置列表失败')
   } finally {
     loading.value = false
   }
@@ -35,17 +35,17 @@ const disposalsEdit = ref()
 // 编辑资产
 const onEditAssets = (row) => {
   disposalsEdit.value.open(row)
-  getDisposalsList()
 }
 // 删除资产
 const onDeleteAssets = async (row) => {
   await deleteDisposalsService(row.id)
   ElMessage.success('删除成功')
-  getDisposalsList()
 }
 // 新建资产
 const onAddAssets = () => {
   disposalsEdit.value.open({})
+}
+const onSuccess = () => {
   getDisposalsList()
 }
 </script>
